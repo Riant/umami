@@ -23,7 +23,7 @@ body {
 }
 
 .zh-CN {
-  font-family: '方体', 'PingFang SC', '黑体', 'Heiti SC', 'Microsoft JhengHei UI',
+  font-family: 'PingFang SC', 'Microsoft Yahei', 'Heiti SC', 'Microsoft JhengHei UI',
     'Microsoft JhengHei', Roboto, Noto, 'Noto Sans CJK SC', sans-serif !important;
 }
 
