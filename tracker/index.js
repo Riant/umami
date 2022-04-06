@@ -16,6 +16,9 @@ import { removeTrailingSlash } from '../lib/url';
 
   if (!script) return;
 
+  const S4 = () => (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+  const GetUUID = (split = '-') => new Date().getTime() + split + S4();
+
   const attr = script.getAttribute.bind(script);
   const website = attr('data-website-id');
   const hostUrl = attr('data-host-url');
@@ -29,6 +32,16 @@ import { removeTrailingSlash } from '../lib/url';
   const eventClass = /^umami--([a-z]+)--([\w]+[\w-]*)$/;
   const eventSelect = "[class*='umami--']";
   const cacheKey = 'umami.cache';
+
+  // 自定义随机串并缓存，以避免同一个局域网内的相同客户端用户被记录为相同的用户
+  let tempUid = '';
+  if (localStorage) {
+    tempUid = localStorage.getItem('umami.tempuid');
+    if (!tempUid) {
+      tempUid = GetUUID();
+      localStorage.setItem('umami.tempuid', tempUid);
+    }
+  }
 
   const trackingDisabled = () =>
     (localStorage && localStorage.getItem('umami.disabled')) ||
@@ -64,6 +77,7 @@ import { removeTrailingSlash } from '../lib/url';
     hostname,
     screen,
     language,
+    tempUid,
     cache: useCache && sessionStorage.getItem(cacheKey),
     url: currentUrl,
   });
@@ -151,6 +165,14 @@ import { removeTrailingSlash } from '../lib/url';
     });
   };
 
+  const setUserinfo = payload => {
+    post(
+      `${root}/api/collect`,
+      { type: 'session', payload: Object.assign(getPayload(), payload) },
+      res => console.log('umami: userinfo update success', res),
+    );
+  };
+
   /* Handle history changes */
 
   const handlePush = (state, title, url) => {
@@ -189,6 +211,7 @@ import { removeTrailingSlash } from '../lib/url';
     const umami = eventValue => trackEvent(eventValue);
     umami.trackView = trackView;
     umami.trackEvent = trackEvent;
+    umami.setUserinfo = setUserinfo;
 
     window.umami = umami;
   }

@@ -54,7 +54,7 @@ export default async (req, res) => {
     await savePageView(website_id, session_id, url, referrer);
   } else if (type === 'event') {
     await saveEvent(website_id, session_id, url, event_type, event_value);
-  } else {
+  } else if (type !== 'session') {
     return badRequest(res);
   }
 

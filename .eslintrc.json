@@ -12,7 +12,6 @@
     "ecmaVersion": 11,
     "sourceType": "module"
   },
-  "plugins": ["react"],
   "rules": {
     "react/display-name": "off",
     "react/react-in-jsx-scope": "off",
